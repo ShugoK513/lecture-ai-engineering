@@ -39,8 +39,14 @@ def display_chat_page(pipe):
 
     # 回答が表示されるべきか判断 (質問があり、回答が生成済みで、まだフィードバックされていない)
     if st.session_state.current_question and st.session_state.current_answer:
-        st.subheader("回答:")
-        st.markdown(st.session_state.current_answer) # Markdownで表示
+        # st.subheader("回答:")
+        # st.markdown(st.session_state.current_answer) # Markdownで表示
+        if "current_question" in st.session_state:
+          with st.chat_message("user"):
+              st.markdown(st.session_state.current_question)
+        if "current_answer" in st.session_state:
+          with st.chat_message("assistant"):
+              st.markdown(st.session_state.current_answer)
         st.info(f"応答時間: {st.session_state.response_time:.2f}秒")
 
         # フィードバックフォームを表示 (まだフィードバックされていない場合)
