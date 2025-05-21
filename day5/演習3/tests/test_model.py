@@ -16,6 +16,7 @@ from sklearn.pipeline import Pipeline
 DATA_PATH = os.path.join(os.path.dirname(__file__), "../data/Titanic.csv")
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "../models")
 MODEL_PATH = os.path.join(MODEL_DIR, "titanic_model.pkl")
+PAST_MODEL_PATH = os.path.join(MODEL_DIR, "titanic_model_past.pkl") # 過去バージョンのモデルパス (適宜変更してください)
 
 
 @pytest.fixture
@@ -171,3 +172,26 @@ def test_model_reproducibility(sample_data, preprocessor):
     assert np.array_equal(
         predictions1, predictions2
     ), "モデルの予測結果に再現性がありません"
+
+
+def test_model_performance_regression(train_model):
+    """過去バージョンのモデルと比較して性能が劣化していないか確認"""
+    current_model, X_test, y_test = train_model
+
+    if not os.path.exists(PAST_MODEL_PATH):
+        pytest.skip(
+            f"比較対象の過去バージョンのモデル ({os.path.basename(PAST_MODEL_PATH)}) が見つからないためスキップします"
+        )
+
+    # 過去バージョンのモデルをロード
+    with open(PAST_MODEL_PATH, "rb") as f:
+        past_model = pickle.load(f)
+
+    # 現在のモデルの精度を計算
+    y_pred_current = current_model.predict(X_test)
+    accuracy_current = accuracy_score(y_test, y_pred_current)
+
+    y_pred_past = past_model.predict(X_test)
+    accuracy_past = accuracy_score(y_test, y_pred_past)
+
+    assert accuracy_past <= accuracy_current, f"モデルが劣化しています\n過去のモデル：{accuracy_past} > 現在のモデル：{accuracy_current}"
