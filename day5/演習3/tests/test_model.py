@@ -16,7 +16,9 @@ from sklearn.pipeline import Pipeline
 DATA_PATH = os.path.join(os.path.dirname(__file__), "../data/Titanic.csv")
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "../models")
 MODEL_PATH = os.path.join(MODEL_DIR, "titanic_model.pkl")
-PAST_MODEL_PATH = os.path.join(MODEL_DIR, "titanic_model_past.pkl") # 過去バージョンのモデルパス (適宜変更してください)
+PAST_MODEL_PATH = os.path.join(
+    MODEL_DIR, "titanic_model_past.pkl"
+)  # 過去バージョンのモデルパス (適宜変更してください)
 
 
 @pytest.fixture
@@ -194,4 +196,6 @@ def test_model_performance_regression(train_model):
     y_pred_past = past_model.predict(X_test)
     accuracy_past = accuracy_score(y_test, y_pred_past)
 
-    assert accuracy_past <= accuracy_current, f"モデルが劣化しています\n過去のモデル：{accuracy_past} > 現在のモデル：{accuracy_current}"
+    assert (
+        accuracy_past <= accuracy_current
+    ), f"モデルが劣化しています\n過去のモデル：{accuracy_past} > 現在のモデル：{accuracy_current}"
